@@ -9,16 +9,20 @@ import {
 } from 'remotion';
 
 /* ------------------------------------------------------------------ */
-/*  Palette — cool ink ground, a curated cold→hot heat ramp           */
+/*  sowly.ai brand palette                                             */
+/*  Ink / Sprout / Deep / Paper / Wash                                 */
 /* ------------------------------------------------------------------ */
-const INK = '#0A0E16';
-const TEXT = '#EAEEF6';
-const SOFT = '#9BA7B9';
-const FAINT = '#5E6982';
-const CARD = 'rgba(255,255,255,0.028)';
-const CARD_BORDER = 'rgba(255,255,255,0.09)';
+const PAPER = '#FBFAF5';
+const INK = '#0F2A1D';
+const DEEP = '#2F6B45';
+const SPROUT = '#74BD1F';
+const WASH = '#C8E89A';
+const CARD = '#FFFFFF';
+const BORDER = 'rgba(15,42,29,0.12)';
+const FAINT = 'rgba(15,42,29,0.42)';
 
-const RAMP = ['#8588F1', '#5C9FE7', '#33BCAC', '#E4B547', '#EC8B54', '#3EC082'];
+// Growth ramp: seed-pale Wash → Sprout → Deep. Encodes "cold data grows warm".
+const RAMP = ['#C8E89A', '#A6D95E', '#8ECF33', '#74BD1F', '#4E9A3C', '#2F6B45'];
 
 const SANS =
   '"Helvetica Neue", Helvetica, "Liberation Sans", "DejaVu Sans", Arial, sans-serif';
@@ -42,35 +46,79 @@ const STEPS: Step[] = [
 /* ------------------------------------------------------------------ */
 /*  Layout constants (used for precise packet travel)                 */
 /* ------------------------------------------------------------------ */
-const PIPE_TOP = 372;
-const ROW_H = 143;
-const BADGE = 60;
-const RAIL_X = 92 + BADGE / 2; // center of the badge column
+const PIPE_TOP = 400;
+const ROW_H = 137;
+const BADGE = 58;
+const RAIL_X = 92 + BADGE / 2;
 
 const badgeCenterY = (i: number) => PIPE_TOP + i * ROW_H + BADGE / 2;
+const badgeText = (i: number) => (i >= 4 ? PAPER : INK);
 
 /* Reveal timing */
 const START = 26;
 const PER = 42;
 const revealAt = (i: number) => START + i * PER;
-const BUILD_END = revealAt(STEPS.length - 1) + PER; // ~296
+const BUILD_END = revealAt(STEPS.length - 1) + PER;
+
+/* ------------------------------------------------------------------ */
+/*  Sprout mark (recreated as SVG, on-palette)                        */
+/* ------------------------------------------------------------------ */
+const Sprout: React.FC<{size: number; color: string; grow?: number}> = ({
+  size,
+  color,
+  grow = 1,
+}) => (
+  <svg width={size} height={size} viewBox="0 0 100 120" style={{display: 'block'}}>
+    <g style={{transformOrigin: '50px 112px', transform: `scale(${grow})`}}>
+      {/* seed leaf at base */}
+      <path d="M50,112 C43,104 38,95 44,88 C55,92 58,103 50,112 Z" fill={color} />
+      {/* stem */}
+      <path
+        d="M50,110 C49,92 49,76 50,60"
+        stroke={color}
+        strokeWidth={6}
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* left cotyledon */}
+      <path d="M50,64 C40,42 26,33 15,27 C24,46 37,56 50,64 Z" fill={color} />
+      {/* right cotyledon */}
+      <path d="M50,60 C61,36 76,26 87,21 C76,41 63,52 50,60 Z" fill={color} />
+    </g>
+  </svg>
+);
+
+const LogoLockup: React.FC<{scale?: number; grow?: number}> = ({scale = 1, grow = 1}) => (
+  <div style={{display: 'flex', alignItems: 'center', gap: 12 * scale}}>
+    <Sprout size={46 * scale} color={INK} grow={grow} />
+    <div
+      style={{
+        fontFamily: SANS,
+        fontWeight: 800,
+        fontSize: 32 * scale,
+        letterSpacing: -0.6,
+        color: INK,
+      }}
+    >
+      Sowly<span style={{color: DEEP}}>.ai</span>
+    </div>
+  </div>
+);
 
 /* ------------------------------------------------------------------ */
 
 export const GtmFlow: React.FC = () => {
   const frame = useCurrentFrame();
-  const {fps, width, height} = useVideoConfig();
+  const {fps} = useVideoConfig();
 
-  // Overall warm-up progress 0..1 for the ambient glow
-  const warm = interpolate(frame, [START, BUILD_END], [0, 1], {
+  const grow = interpolate(frame, [START, BUILD_END], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  // Header entrance
   const headIn = spring({frame: frame - 4, fps, config: {damping: 200}});
+  const logoGrow = spring({frame: frame - 2, fps, config: {damping: 12, stiffness: 90, mass: 0.9}});
 
-  // Packet position along the rail
   const buildProg = interpolate(frame, [START, revealAt(STEPS.length - 1)], [0, STEPS.length - 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
@@ -88,31 +136,27 @@ export const GtmFlow: React.FC = () => {
     {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'},
   );
 
-  // Final tagline emphasis
-  const tagIn = spring({frame: frame - (BUILD_END + 4), fps, config: {damping: 200}});
-
   return (
-    <AbsoluteFill style={{backgroundColor: INK, fontFamily: SANS}}>
-      {/* Ambient glows — cool at top, a warm base that grows as the pipeline fills */}
+    <AbsoluteFill style={{backgroundColor: PAPER, fontFamily: SANS}}>
+      {/* Ambient wash glows — a soft green base that grows as the pipeline fills */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(120% 60% at 50% -8%, rgba(93,159,231,0.16), transparent 60%)`,
+          background: `radial-gradient(120% 55% at 50% -6%, rgba(200,232,154,0.35), transparent 60%)`,
         }}
       />
       <AbsoluteFill
         style={{
-          opacity: warm,
-          background: `radial-gradient(110% 55% at 50% 112%, rgba(62,192,130,0.20), transparent 62%)`,
+          opacity: grow,
+          background: `radial-gradient(110% 55% at 50% 112%, rgba(116,189,31,0.18), transparent 60%)`,
         }}
       />
-      {/* faint grid texture */}
       <AbsoluteFill
         style={{
-          opacity: 0.5,
+          opacity: 0.6,
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
+            'linear-gradient(rgba(15,42,29,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(15,42,29,0.035) 1px, transparent 1px)',
           backgroundSize: '54px 54px',
-          maskImage: 'radial-gradient(120% 90% at 50% 40%, #000 55%, transparent 100%)',
+          maskImage: 'radial-gradient(120% 90% at 50% 42%, #000 55%, transparent 100%)',
         }}
       />
 
@@ -120,44 +164,60 @@ export const GtmFlow: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          top: 96,
+          top: 88,
           left: 92,
           right: 92,
           opacity: headIn,
-          transform: `translateY(${(1 - headIn) * 18}px)`,
+          transform: `translateY(${(1 - headIn) * 16}px)`,
         }}
       >
+        <div style={{marginBottom: 26}}>
+          <LogoLockup grow={logoGrow} />
+        </div>
         <div
           style={{
             fontFamily: MONO,
-            fontSize: 21,
-            letterSpacing: 6,
-            color: SOFT,
+            fontSize: 20,
+            letterSpacing: 5.5,
+            color: DEEP,
             display: 'flex',
             alignItems: 'center',
-            gap: 16,
-            marginBottom: 22,
+            gap: 15,
+            marginBottom: 18,
           }}
         >
-          <span style={{width: 34, height: 2, background: 'rgba(255,255,255,0.28)'}} />
+          <span style={{width: 32, height: 2, background: SPROUT}} />
           SIGNAL-BASED OUTBOUND
         </div>
         <div
           style={{
-            fontSize: 58,
+            fontSize: 55,
             fontWeight: 800,
-            lineHeight: 1.04,
+            lineHeight: 1.05,
             letterSpacing: -1.4,
-            color: TEXT,
+            color: INK,
           }}
         >
           From a cold list to a task
           <br />
-          your rep can act on <span style={{color: RAMP[4]}}>today</span>.
+          your rep can act on{' '}
+          <span
+            style={{
+              background: WASH,
+              color: INK,
+              padding: '0 12px',
+              borderRadius: 10,
+              boxDecorationBreak: 'clone',
+              WebkitBoxDecorationBreak: 'clone',
+            }}
+          >
+            today
+          </span>
+          .
         </div>
       </div>
 
-      {/* ---------- Connectors (drawn behind badges) ---------- */}
+      {/* ---------- Connectors ---------- */}
       {STEPS.slice(0, -1).map((_, i) => {
         const top = badgeCenterY(i) + BADGE / 2 - 2;
         const h = badgeCenterY(i + 1) - BADGE / 2 - (badgeCenterY(i) + BADGE / 2) + 4;
@@ -188,30 +248,30 @@ export const GtmFlow: React.FC = () => {
         <StepRow key={step.n} step={step} i={i} frame={frame} fps={fps} />
       ))}
 
-      {/* ---------- Travelling data packet ---------- */}
+      {/* ---------- Travelling seed / packet ---------- */}
       <div
         style={{
           position: 'absolute',
           left: RAIL_X,
           top: packetY,
-          width: 22,
-          height: 22,
-          marginLeft: -11,
-          marginTop: -11,
+          width: 20,
+          height: 20,
+          marginLeft: -10,
+          marginTop: -10,
           borderRadius: '50%',
           background: packetColor,
           opacity: packetOpacity,
-          boxShadow: `0 0 22px 6px ${packetColor}`,
+          boxShadow: `0 0 18px 5px ${WASH}`,
         }}
       />
 
-      {/* ---------- Footer tagline ---------- */}
+      {/* ---------- Footer ---------- */}
       <div
         style={{
           position: 'absolute',
           left: 92,
           right: 92,
-          bottom: 74,
+          bottom: 70,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -221,18 +281,16 @@ export const GtmFlow: React.FC = () => {
         <div
           style={{
             fontFamily: MONO,
-            fontSize: 20,
-            letterSpacing: 2,
+            fontSize: 19,
+            letterSpacing: 1.5,
             color: FAINT,
-            transform: `scale(${0.98 + tagIn * 0.02})`,
-            transformOrigin: 'left center',
           }}
         >
-          <span style={{color: RAMP[0]}}>COLD DATA</span>
-          <span style={{color: FAINT}}> {'──▶'} </span>
-          <span style={{color: RAMP[5], opacity: 0.5 + tagIn * 0.5}}>READY TO ACT</span>
+          <span style={{color: DEEP, fontWeight: 700}}>COLD DATA</span>
+          <span> {'──▶'} </span>
+          <span style={{color: DEEP, fontWeight: 700}}>READY TO ACT</span>
         </div>
-        <HeatBar frame={frame} />
+        <GrowthBar frame={frame} />
       </div>
     </AbsoluteFill>
   );
@@ -260,11 +318,8 @@ const StepRow: React.FC<{step: Step; i: number; frame: number; fps: number}> = (
   const badgeTop = PIPE_TOP + i * ROW_H;
   const centerY = badgeCenterY(i);
 
-  // The final "activation" pulse on the CRM task (last step)
   const isLast = i === STEPS.length - 1;
-  const pulse = isLast
-    ? Math.sin(Math.max(0, frame - (BUILD_END + 6)) / 5) * 0.5 + 0.5
-    : 0;
+  const pulse = isLast ? Math.sin(Math.max(0, frame - (BUILD_END + 6)) / 5) * 0.5 + 0.5 : 0;
   const pulseGlow = isLast
     ? interpolate(frame, [BUILD_END, BUILD_END + 12], [0, 1], {
         extrapolateLeft: 'clamp',
@@ -282,19 +337,19 @@ const StepRow: React.FC<{step: Step; i: number; frame: number; fps: number}> = (
           top: badgeTop,
           width: BADGE,
           height: BADGE,
-          borderRadius: 16,
+          borderRadius: 15,
           background: color,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontFamily: MONO,
           fontWeight: 700,
-          fontSize: 22,
-          color: '#0A0E16',
+          fontSize: 21,
+          color: badgeText(i),
           opacity: appear,
           transform: `scale(${0.4 + badgePop * 0.6})`,
-          boxShadow: `0 10px 26px ${color}55${pulseGlow ? '' : ''}`,
-          outline: pulseGlow ? `${2 + pulse * 6}px solid ${color}` : 'none',
+          boxShadow: `0 8px 20px ${color}44`,
+          outline: pulseGlow ? `${2 + pulse * 6}px solid ${SPROUT}` : 'none',
           outlineOffset: `${pulse * 4}px`,
         }}
       >
@@ -305,23 +360,22 @@ const StepRow: React.FC<{step: Step; i: number; frame: number; fps: number}> = (
       <div
         style={{
           position: 'absolute',
-          left: 186,
-          top: centerY - 56,
+          left: 184,
+          top: centerY - 52,
           right: 92,
-          minHeight: 112,
-          padding: '16px 24px',
+          minHeight: 104,
+          padding: '15px 24px',
           borderRadius: 18,
           background: CARD,
-          border: `1px solid ${isLast ? color + 'cc' : CARD_BORDER}`,
+          border: `1px solid ${isLast ? DEEP + '88' : BORDER}`,
           boxShadow: isLast
-            ? `0 0 0 1px ${color}44, 0 18px 44px ${color}22`
-            : 'none',
+            ? `0 0 0 1px ${SPROUT}55, 0 16px 40px rgba(47,107,69,0.20)`
+            : '0 8px 26px rgba(15,42,29,0.05)',
           opacity: cardIn,
           transform: `translateX(${(1 - cardIn) * -22}px)`,
           overflow: 'hidden',
         }}
       >
-        {/* left accent rail */}
         <div
           style={{
             position: 'absolute',
@@ -330,24 +384,13 @@ const StepRow: React.FC<{step: Step; i: number; frame: number; fps: number}> = (
             bottom: 0,
             width: 4,
             background: color,
-            opacity: 0.9,
           }}
         />
-        <div style={{display: 'flex', alignItems: 'baseline', gap: 14}}>
-          <div style={{fontSize: 33, fontWeight: 750, letterSpacing: -0.6, color: TEXT}}>
-            {step.title}
-          </div>
+        <div style={{fontSize: 32, fontWeight: 750, letterSpacing: -0.6, color: INK}}>
+          {step.title}
         </div>
-        <div style={{fontSize: 22, color: SOFT, marginTop: 3}}>{step.what}</div>
-        <div
-          style={{
-            fontFamily: MONO,
-            fontSize: 17.5,
-            color,
-            marginTop: 10,
-            opacity: 0.92,
-          }}
-        >
+        <div style={{fontSize: 21, color: DEEP, marginTop: 2}}>{step.what}</div>
+        <div style={{fontFamily: MONO, fontSize: 17, color: DEEP, marginTop: 9, opacity: 0.85}}>
           {'▸ '}
           {step.example}
         </div>
@@ -357,9 +400,9 @@ const StepRow: React.FC<{step: Step; i: number; frame: number; fps: number}> = (
 };
 
 /* ------------------------------------------------------------------ */
-/*  Little animated heat legend bar in the footer                     */
+/*  Growth legend bar                                                  */
 /* ------------------------------------------------------------------ */
-const HeatBar: React.FC<{frame: number}> = ({frame}) => {
+const GrowthBar: React.FC<{frame: number}> = ({frame}) => {
   const sheen = interpolate(frame % 100, [0, 55, 100], [-1.1, 2.4, 2.4], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
@@ -380,7 +423,7 @@ const HeatBar: React.FC<{frame: number}> = ({frame}) => {
           position: 'absolute',
           inset: 0,
           transform: `translateX(${sheen * 100}%)`,
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
         }}
       />
     </div>
