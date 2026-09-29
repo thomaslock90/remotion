@@ -1,8 +1,10 @@
 import React from 'react';
 import {
   AbsoluteFill,
+  Img,
   interpolate,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
@@ -74,26 +76,6 @@ const T_FOOTER = 300;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const nl = (n: number) => Math.round(n).toLocaleString('nl-NL');
 
-/* ------------------------------------------------------------------ */
-/*  Sprout logo                                                        */
-/* ------------------------------------------------------------------ */
-const Sprout: React.FC<{size: number; color: string; grow: number}> = ({size, color, grow}) => (
-  <svg width={size} height={size} viewBox="0 0 100 120" style={{display: 'block'}}>
-    <g style={{transformOrigin: '50px 112px', transform: `scale(${grow})`}}>
-      <path d="M50,112 C43,104 38,95 44,88 C55,92 58,103 50,112 Z" fill={color} />
-      <path
-        d="M50,110 C49,92 49,76 50,60"
-        stroke={color}
-        strokeWidth={6}
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path d="M50,64 C40,42 26,33 15,27 C24,46 37,56 50,64 Z" fill={color} />
-      <path d="M50,60 C61,36 76,26 87,21 C76,41 63,52 50,60 Z" fill={color} />
-    </g>
-  </svg>
-);
-
 const Shield: React.FC<{size: number; color: string}> = ({size, color}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" style={{display: 'block'}}>
     <path
@@ -114,7 +96,7 @@ export const DncFlow: React.FC = () => {
   const {fps} = useVideoConfig();
 
   const headIn = spring({frame: frame - 4, fps, config: {damping: 200}});
-  const logoGrow = spring({frame: frame - 2, fps, config: {damping: 12, stiffness: 90, mass: 0.9}});
+  const logoIn = spring({frame: frame - 2, fps, config: {damping: 14, stiffness: 90, mass: 0.9}});
   const listIn = spring({frame: frame - T_LIST, fps, config: {damping: 200}});
   const dncIn = spring({frame: frame - T_DNC, fps, config: {damping: 200}});
   const hitlIn = spring({frame: frame - T_HITL, fps, config: {damping: 200}});
@@ -144,23 +126,31 @@ export const DncFlow: React.FC = () => {
         }}
       />
 
+      {/* ---------- Logo ---------- */}
+      <Img
+        src={staticFile('sowly-logo.png')}
+        style={{
+          position: 'absolute',
+          top: 86,
+          right: X,
+          height: 132,
+          opacity: logoIn,
+          transform: `scale(${0.85 + logoIn * 0.15})`,
+          transformOrigin: 'top right',
+        }}
+      />
+
       {/* ---------- Header ---------- */}
       <div
         style={{
           position: 'absolute',
-          top: 70,
+          top: 124,
           left: X,
           right: X,
           opacity: headIn,
           transform: `translateY(${(1 - headIn) * 16}px)`,
         }}
       >
-        <div style={{display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24}}>
-          <Sprout size={44} color={INK} grow={logoGrow} />
-          <div style={{fontWeight: 800, fontSize: 30, letterSpacing: -0.6}}>
-            Sowly<span style={{color: DEEP}}>.ai</span>
-          </div>
-        </div>
         <div
           style={{
             fontFamily: MONO,

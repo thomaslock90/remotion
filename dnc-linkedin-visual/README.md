@@ -22,5 +22,7 @@ to skip the Chrome download.
 
 ## Edit
 
+The logo is `public/sowly-logo.png` (official sowly.ai logo, background removed).
+
 Copy lives at the top of `src/DncFlow.tsx`: `TOTAL` / `EXCLUDED` (example
 numbers), `DNC_ITEMS` and `HITL_STEPS`.
