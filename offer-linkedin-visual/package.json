@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "render": "remotion render src/index.ts GtmOffer out/gtm-offer.mp4",
-    "still": "remotion still src/index.ts GtmOffer out/gtm-offer.png --frame=449",
+    "still": "remotion still src/index.ts GtmOffer out/gtm-offer.png --frame=0",
     "studio": "remotion studio src/index.ts"
   },
   "dependencies": {

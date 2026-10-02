@@ -8,8 +8,10 @@ the three sequential GTM steps for LinkedIn:
 Leads first leak away at a weak offer; then three offer boosters (acute pain, simple
 pricing & scope, hard results) click in and leads flow through to customers.
 
-- **Format:** 1080×1350 (4:5), 30 fps, 15 s (450 frames), H.264 + AAC
-- The last frame (449) is the complete static visual and doubles as the thumbnail.
+- **Format:** 1080×1350 (4:5), 30 fps, ~15.7 s (470 frames), H.264 + AAC
+- The video opens on the finished visual for 20 frames (`POSTER` in `src/Root.tsx`), so
+  the first frame, which players and LinkedIn show before playback, is the preview.
+  It then fades into the 15 s animation. Frame 0 is also the static PNG.
 
 ## Render
 
