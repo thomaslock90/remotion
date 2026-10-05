@@ -30,6 +30,18 @@ ffmpeg -i out/segment-split.mp4 -i out/thumb.jpg -map 0 -map 1 -c copy \
   -disposition:v:1 attached_pic out/segment-split-thumb.mp4
 ```
 
+## LinkedIn export
+
+LinkedIn rejects the raw render (moov index at the end, full-range `yuvj420p`), and an
+embedded cover image adds a second video stream it cannot handle. Re-encode before
+uploading, and upload the PNG separately as the custom thumbnail:
+
+```bash
+ffmpeg -i out/segment-split.mp4 -map 0:v:0 -map 0:a:0 \
+  -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -color_range tv -crf 18 -r 30 -g 60 \
+  -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart out/segment-split-linkedin.mp4
+```
+
 ## Edit
 
 Copy lives at the top of `src/SegmentSplit.tsx`: `MID_PCT`, `ENT_PCT` and `ROWS`.

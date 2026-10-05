@@ -20,6 +20,18 @@ In this container, add
 `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`
 to skip the Chrome download.
 
+## LinkedIn export
+
+LinkedIn rejects the raw render (moov index at the end, full-range `yuvj420p`), and an
+embedded cover image adds a second video stream it cannot handle. Re-encode before
+uploading, and upload the PNG separately as the custom thumbnail:
+
+```bash
+ffmpeg -i out/dnc-flow.mp4 -map 0:v:0 -map 0:a:0 \
+  -c:v libx264 -profile:v high -level:v 4.0 -pix_fmt yuv420p -color_range tv -crf 18 -r 30 -g 60 \
+  -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart out/dnc-flow-linkedin.mp4
+```
+
 ## Edit
 
 The logo is `public/sowly-logo.png` (official sowly.ai logo, background removed).
