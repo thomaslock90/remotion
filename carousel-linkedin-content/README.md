@@ -1,7 +1,8 @@
 # Content carousel — LinkedIn (PDF)
 
 A self-contained [Remotion](https://remotion.dev) project (sowly.ai brand) that renders an
-8-slide LinkedIn carousel about content as the front end of the sales machine, closing
+10-slide LinkedIn carousel about content as the front end of the sales machine, with
+client campaign data as proof, closing
 with a Thomas Lock page.
 
 - **Format:** 1080×1350 (4:5) per slide; one Remotion frame per slide.
@@ -11,7 +12,7 @@ with a Thomas Lock page.
 
 ```bash
 npm install
-npm run slides          # writes out/slides/element-0.png … element-7.png
+npm run slides          # writes out/slides/element-0.png … element-9.png
 ```
 
 In this container, add
@@ -36,4 +37,5 @@ open('out/sowly-content-carousel.pdf', 'wb').write(
 ## Edit
 
 Each slide is a function in `src/Carousel.tsx` (`SLIDES` sets the order).
-`public/sowly-logo.png` is the logo, `public/thomas.jpg` the portrait on the last slide.
+`public/sowly-logo.png` is the logo, `public/thomas.jpg` the portrait on the last slide,
+`public/proof-weekly.png` / `public/proof-none.png` the campaign dashboard screenshots.
