@@ -533,7 +533,11 @@ function Closing() {
 /*  08 — About Thomas Lock                                             */
 /* ------------------------------------------------------------------ */
 function About() {
-  const steps = ['Meetbare baseline', 'Hypotheses testen en meten', 'Opschalen wat werkt'];
+  const outcomes = [
+    {t: 'Je volledige markt en beslissers in kaart', s: 'per segment'},
+    {t: 'Signalen die laten zien wie vandaag op zoek is', s: 'naar jouw product of dienst'},
+    {t: 'Een CRM dat klopt', s: 'en een salesfunnel die voorspelbaar pipeline oplevert'},
+  ];
   const stats = [
     {n: '10+', l: 'B2B-bedrijven'},
     {n: '400+', l: 'gekwalificeerde salesgesprekken'},
@@ -546,84 +550,89 @@ function About() {
         <Img
           src={staticFile('thomas.jpg')}
           style={{
-            width: 150,
-            height: 150,
-            borderRadius: 75,
+            width: 132,
+            height: 132,
+            borderRadius: 66,
             objectFit: 'cover',
             border: `5px solid ${CARD}`,
             boxShadow: `0 0 0 3px ${SPROUT}, 0 14px 30px rgba(15,42,29,0.18)`,
           }}
         />
         <div>
-          <div style={{fontSize: 60, fontWeight: 800, letterSpacing: -1.5}}>Thomas Lock</div>
+          <div style={{fontSize: 56, fontWeight: 800, letterSpacing: -1.4}}>Thomas Lock</div>
           <div style={{fontSize: 26, color: DEEP, marginTop: 6, fontWeight: 600}}>
             GTM & RevOps architect · Founder Sowly.ai
           </div>
         </div>
       </div>
 
-      <div style={{fontSize: 38, lineHeight: 1.3, marginTop: 48, fontWeight: 700, letterSpacing: -0.5}}>
+      <div style={{fontSize: 36, lineHeight: 1.28, marginTop: 34, fontWeight: 700, letterSpacing: -0.5}}>
         Ik bouw de salesmachine van <Mark>B2B Tech-, SaaS- en servicebedrijven</Mark>.
       </div>
-      <div style={{fontSize: 26, lineHeight: 1.4, color: DEEP, marginTop: 14}}>
-        Zodat je precies weet welke bron echt omzet oplevert, en opschaalt wat werkt.
-      </div>
 
-      <div style={{display: 'flex', alignItems: 'stretch', gap: 10, marginTop: 30}}>
-        {steps.map((s, k) => (
-          <React.Fragment key={s}>
+      <div style={{fontFamily: MONO, fontSize: 17, letterSpacing: 3, color: DEEP, marginTop: 30}}>WAT JE KRIJGT</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14}}>
+        {outcomes.map((o) => (
+          <div
+            key={o.t}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 18,
+              padding: '11px 20px',
+              borderRadius: 14,
+              background: CARD,
+              border: `1px solid ${BORDER}`,
+            }}
+          >
             <div
               style={{
-                flex: 1,
-                padding: '14px 14px',
-                borderRadius: 12,
-                background: CARD,
-                border: `1px solid ${BORDER}`,
-                fontSize: 21,
-                fontWeight: 700,
-                textAlign: 'center',
-                lineHeight: 1.2,
+                width: 38,
+                height: 38,
+                flexShrink: 0,
+                borderRadius: 10,
+                background: SPROUT,
+                color: INK,
+                fontSize: 20,
+                fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <span>
-                <span style={{fontFamily: MONO, color: DEEP, fontSize: 17}}>{k + 1}. </span>
-                {s}
-              </span>
+              ✓
             </div>
-            {k < steps.length - 1 ? <div style={{color: SPROUT, fontWeight: 800, fontSize: 26, alignSelf: 'center'}}>→</div> : null}
-          </React.Fragment>
+            <div>
+              <div style={{fontSize: 25, fontWeight: 750, letterSpacing: -0.3}}>{o.t}</div>
+              <div style={{fontSize: 19, color: DEEP, marginTop: 2}}>{o.s}</div>
+            </div>
+          </div>
         ))}
       </div>
 
-      <div style={{fontFamily: MONO, fontSize: 17, letterSpacing: 3, color: DEEP, marginTop: 40}}>RESULTATEN TOT NU TOE</div>
+      <div style={{fontFamily: MONO, fontSize: 17, letterSpacing: 3, color: DEEP, marginTop: 26}}>→ DAT LEVERT OP</div>
       <div style={{display: 'flex', gap: 16, marginTop: 14}}>
         {stats.map((s) => (
           <div
             key={s.n}
             style={{
               flex: 1,
-              padding: '22px 22px',
+              padding: '14px 22px 16px',
               borderRadius: 16,
               background: WASH,
             }}
           >
-            <div style={{fontSize: 50, fontWeight: 800, letterSpacing: -1.2, color: INK}}>{s.n}</div>
+            <div style={{fontSize: 46, fontWeight: 800, letterSpacing: -1.2, color: INK}}>{s.n}</div>
             <div style={{fontSize: 20, color: DEEP, marginTop: 4, lineHeight: 1.25, fontWeight: 600}}>{s.l}</div>
           </div>
         ))}
       </div>
-      <div style={{fontFamily: MONO, fontSize: 17, color: FAINT, marginTop: 14, letterSpacing: 0.5}}>
-        Gebouwd op je bestaande tools · het systeem is van jou
-      </div>
 
-      <div style={{flex: 1}} />
+      <div style={{flex: 1, minHeight: 28}} />
 
       <div
         style={{
-          padding: '28px 32px',
+          padding: '22px 30px',
           borderRadius: 22,
           background: INK,
           color: PAPER,
@@ -634,8 +643,8 @@ function About() {
         }}
       >
         <div>
-          <div style={{fontSize: 32, fontWeight: 800, letterSpacing: -0.5}}>Stuur me een DM met “System”</div>
-          <div style={{fontSize: 22, color: WASH, marginTop: 6}}>of plan een gesprek via mijn profiel</div>
+          <div style={{fontSize: 32, fontWeight: 800, letterSpacing: -0.5}}>Volg mij voor meer</div>
+          <div style={{fontSize: 32, fontWeight: 800, letterSpacing: -0.5, color: SPROUT}}>GTM- en RevOps-plays</div>
         </div>
         <div
           style={{
