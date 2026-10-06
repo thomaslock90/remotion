@@ -91,7 +91,7 @@ export const Carousel: React.FC = () => {
           color: dark ? WASH : FAINT,
         }}
       >
-        <span>Thomas Lock · GTM & RevOps</span>
+        <span>Thomas Lock · GTM & RevOps architect</span>
         {i < SLIDE_COUNT - 1 ? (
           <span style={{color: dark ? SPROUT : DEEP, fontWeight: 700}}>Swipe →</span>
         ) : null}
@@ -533,57 +533,97 @@ function Closing() {
 /*  08 — About Thomas Lock                                             */
 /* ------------------------------------------------------------------ */
 function About() {
-  const focus = ['Sales Foundations', 'GTM Motion', 'Revenue Acceleration', 'Retention'];
+  const steps = ['Meetbare baseline', 'Hypotheses testen en meten', 'Opschalen wat werkt'];
+  const stats = [
+    {n: '10+', l: 'B2B-bedrijven'},
+    {n: '400+', l: 'gekwalificeerde salesgesprekken'},
+    {n: '€6M+', l: 'pipeline'},
+  ];
   return (
     <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
       <Eyebrow>OVER MIJ</Eyebrow>
-      <div style={{display: 'flex', alignItems: 'center', gap: 32}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: 30}}>
         <Img
           src={staticFile('thomas.jpg')}
           style={{
-            width: 168,
-            height: 168,
-            borderRadius: 84,
+            width: 150,
+            height: 150,
+            borderRadius: 75,
             objectFit: 'cover',
             border: `5px solid ${CARD}`,
             boxShadow: `0 0 0 3px ${SPROUT}, 0 14px 30px rgba(15,42,29,0.18)`,
           }}
         />
         <div>
-          <div style={{fontSize: 64, fontWeight: 800, letterSpacing: -1.6}}>Thomas Lock</div>
-          <div style={{fontSize: 28, color: DEEP, marginTop: 6, fontWeight: 600}}>GTM Engineer & RevOps specialist</div>
+          <div style={{fontSize: 60, fontWeight: 800, letterSpacing: -1.5}}>Thomas Lock</div>
+          <div style={{fontSize: 26, color: DEEP, marginTop: 6, fontWeight: 600}}>
+            GTM & RevOps architect · Founder Sowly.ai
+          </div>
         </div>
       </div>
 
-      <div style={{fontSize: 38, lineHeight: 1.35, marginTop: 60, fontWeight: 600, letterSpacing: -0.4}}>
-        Ik help B2B-bedrijven in Tech, SaaS en High Ticket met deals vanaf{' '}
-        <Mark>€10K</Mark> een salesmachine te bouwen die voorspelbaar groeit.
+      <div style={{fontSize: 38, lineHeight: 1.3, marginTop: 48, fontWeight: 700, letterSpacing: -0.5}}>
+        Ik bouw de salesmachine van <Mark>B2B Tech-, SaaS- en servicebedrijven</Mark>.
+      </div>
+      <div style={{fontSize: 26, lineHeight: 1.4, color: DEEP, marginTop: 14}}>
+        Zodat je precies weet welke bron echt omzet oplevert, en opschaalt wat werkt.
       </div>
 
-      <div style={{display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 36}}>
-        {focus.map((f) => (
+      <div style={{display: 'flex', alignItems: 'stretch', gap: 10, marginTop: 30}}>
+        {steps.map((s, k) => (
+          <React.Fragment key={s}>
+            <div
+              style={{
+                flex: 1,
+                padding: '14px 14px',
+                borderRadius: 12,
+                background: CARD,
+                border: `1px solid ${BORDER}`,
+                fontSize: 21,
+                fontWeight: 700,
+                textAlign: 'center',
+                lineHeight: 1.2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span>
+                <span style={{fontFamily: MONO, color: DEEP, fontSize: 17}}>{k + 1}. </span>
+                {s}
+              </span>
+            </div>
+            {k < steps.length - 1 ? <div style={{color: SPROUT, fontWeight: 800, fontSize: 26, alignSelf: 'center'}}>→</div> : null}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div style={{fontFamily: MONO, fontSize: 17, letterSpacing: 3, color: DEEP, marginTop: 40}}>RESULTATEN TOT NU TOE</div>
+      <div style={{display: 'flex', gap: 16, marginTop: 14}}>
+        {stats.map((s) => (
           <div
-            key={f}
+            key={s.n}
             style={{
-              padding: '14px 22px',
-              borderRadius: 12,
-              background: CARD,
-              border: `1px solid ${BORDER}`,
-              fontSize: 26,
-              fontWeight: 700,
-              color: INK,
+              flex: 1,
+              padding: '22px 22px',
+              borderRadius: 16,
+              background: WASH,
             }}
           >
-            {f}
+            <div style={{fontSize: 50, fontWeight: 800, letterSpacing: -1.2, color: INK}}>{s.n}</div>
+            <div style={{fontSize: 20, color: DEEP, marginTop: 4, lineHeight: 1.25, fontWeight: 600}}>{s.l}</div>
           </div>
         ))}
+      </div>
+      <div style={{fontFamily: MONO, fontSize: 17, color: FAINT, marginTop: 14, letterSpacing: 0.5}}>
+        Gebouwd op je bestaande tools · het systeem is van jou
       </div>
 
       <div style={{flex: 1}} />
 
       <div
         style={{
-          padding: '30px 34px',
+          padding: '28px 32px',
           borderRadius: 22,
           background: INK,
           color: PAPER,
@@ -594,16 +634,16 @@ function About() {
         }}
       >
         <div>
-          <div style={{fontSize: 34, fontWeight: 800, letterSpacing: -0.5}}>Volg voor meer over GTM</div>
-          <div style={{fontSize: 23, color: WASH, marginTop: 6}}>en repost ♻ als dit je team helpt</div>
+          <div style={{fontSize: 32, fontWeight: 800, letterSpacing: -0.5}}>Stuur me een DM met “System”</div>
+          <div style={{fontSize: 22, color: WASH, marginTop: 6}}>of plan een gesprek via mijn profiel</div>
         </div>
         <div
           style={{
-            padding: '16px 26px',
+            padding: '16px 24px',
             borderRadius: 14,
             background: SPROUT,
             color: INK,
-            fontSize: 26,
+            fontSize: 25,
             fontWeight: 800,
             whiteSpace: 'nowrap',
           }}
