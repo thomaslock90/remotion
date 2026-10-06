@@ -31,7 +31,7 @@ for k, f in enumerate(fs, 1):
     Image.open(f).convert('RGB').save(o)
     pngs.append(o)
 open('out/sowly-content-carousel.pdf', 'wb').write(
-    img2pdf.convert(pngs, layout_fun=img2pdf.get_fixed_dpi_layout_fun((144, 144))))
+    img2pdf.convert(pngs, layout_fun=img2pdf.get_fixed_dpi_layout_fun((72, 72))))
 ```
 
 ## Edit
