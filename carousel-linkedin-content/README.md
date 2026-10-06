@@ -1,6 +1,6 @@
 # Content carousel — LinkedIn (PDF)
 
-A self-contained [Remotion](https://remotion.dev) project (sowly.ai brand) that renders an
+A self-contained [Remotion](https://remotion.dev) project (sowly.ai brand) that renders a
 10-slide LinkedIn carousel about content as the front end of the sales machine, with
 client campaign data as proof, closing
 with a Thomas Lock page.
