@@ -5,7 +5,9 @@ different versions of "our ideal customer" (sales, customer success, management,
 closed-won) jitter as noise, then converge into one one-page ICP, followed by three
 Scaling Up (Verne Harnish) moves and the closing question.
 
-- **Format:** 1080×1350 (4:5), 30 fps, ~15.7 s (470 frames)
+- **Formats:** `IcpNoise` 1080×1350 (4:5) and `IcpNoiseSquare` 1080×1080 (1:1), 30 fps,
+  ~15.7 s (470 frames). Both share one animation; `TALL` / `SQUARE` in `src/IcpNoise.tsx`
+  set the vertical rhythm.
 - The video opens on the finished visual for 20 frames (`POSTER` in `src/Root.tsx`), so
   the first frame, shown before playback, is the preview. Frame 0 is also the static PNG.
 - The ICP values on the four cards are illustrative examples.
@@ -15,7 +17,8 @@ Scaling Up (Verne Harnish) moves and the closing question.
 ```bash
 npm install
 npm run still           # writes out/icp-noise.png
-npm run render          # writes out/icp-noise.mp4 (raw)
+npm run render          # writes out/icp-noise.mp4 (raw, 4:5)
+npx remotion render src/index.ts IcpNoiseSquare out/icp-noise-square.mp4   # 1:1
 ```
 
 In this container, add
@@ -34,9 +37,10 @@ ffmpeg -i out/icp-noise.mp4 -map 0:v:0 -map 0:a:0 \
 
 ## LinkedIn GIF (organic post)
 
-A separate 4 s seamless loop (`IcpLoop`, 15 fps) that starts and ends on the finished
+A separate 4 s seamless loop (`IcpLoop` 4:5, `IcpLoopSquare` 1:1, 15 fps) that starts and ends on the finished
 visual: the four versions get noisy and settle again while data flows into the one-pager.
-Rendered at 1200×1500 (4:5) and kept well under LinkedIn's 5 MB GIF limit (~2.1 MB):
+Rendered at 1200×1500 (4:5) or 1200×1200 (1:1) with `--scale=1.1111111`, each ~2 MB,
+well under LinkedIn's 5 MB GIF limit:
 
 ```bash
 npx remotion render src/index.ts IcpLoop out/loop --sequence --image-format=png --scale=1.1111111

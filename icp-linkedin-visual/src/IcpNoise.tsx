@@ -52,14 +52,39 @@ const MOVES = [
 /*  Layout                                                             */
 /* ------------------------------------------------------------------ */
 const X = 80;
-const MID_TOP = 352;
 const VOICE_W = 500;
-const VOICE_H = 112;
-const VOICE_GAP = 22;
 const CARD_X = 650;
 const CARD_W = 1080 - X - CARD_X;
-const CARD_H = 4 * VOICE_H + 3 * VOICE_GAP;
-const MOVES_TOP = MID_TOP + CARD_H + 78;
+
+// Vertical rhythm per format: 4:5 (1080x1350) and 1:1 (1080x1080)
+type Layout = {
+  midTop: number;
+  voiceH: number;
+  voiceGap: number;
+  cardH: number;
+  movesTop: number;
+  logoTop: number;
+  logoH: number;
+  headTop: number;
+  titleSize: number;
+  footerBottom: number;
+  footerSize: number;
+  movesPad: string;
+  oneGap: number;
+  oneTop: number;
+};
+const makeLayout = (l: Omit<Layout, 'cardH' | 'movesTop'> & {movesGap: number}): Layout => {
+  const cardH = 4 * l.voiceH + 3 * l.voiceGap;
+  return {...l, cardH, movesTop: l.midTop + cardH + l.movesGap};
+};
+const TALL = makeLayout({
+  midTop: 352, voiceH: 112, voiceGap: 22, movesGap: 78, logoTop: 86, logoH: 132, headTop: 124,
+  titleSize: 54, footerBottom: 64, footerSize: 24, movesPad: '22px 20px 26px', oneGap: 17, oneTop: 26,
+});
+const SQUARE = makeLayout({
+  midTop: 292, voiceH: 88, voiceGap: 14, movesGap: 64, logoTop: 52, logoH: 104, headTop: 76,
+  titleSize: 50, footerBottom: 44, footerSize: 22, movesPad: '16px 18px 18px', oneGap: 9, oneTop: 16,
+});
 
 /* Timeline (30 fps, 450 frames) */
 const T_VOICES = 26;
@@ -73,13 +98,15 @@ const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 /* ------------------------------------------------------------------ */
 
-export const IcpNoise: React.FC = () => <IcpScene loop={false} />;
+export const IcpNoise: React.FC = () => <IcpScene loop={false} L={TALL} />;
+export const IcpNoiseSquare: React.FC = () => <IcpScene loop={false} L={SQUARE} />;
 
 // Short seamless loop for the GIF: starts and ends on the finished visual, the voices
 // get noisy and settle again while data flows into the one-pager.
-export const IcpLoop: React.FC = () => <IcpScene loop />;
+export const IcpLoop: React.FC = () => <IcpScene loop L={TALL} />;
+export const IcpLoopSquare: React.FC = () => <IcpScene loop L={SQUARE} />;
 
-const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
+const IcpScene: React.FC<{loop: boolean; L: Layout}> = ({loop, L}) => {
   const raw = useCurrentFrame();
   const {durationInFrames, fps: videoFps} = useVideoConfig();
   const frame = loop ? 449 : raw;
@@ -116,9 +143,9 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
         src={staticFile('sowly-logo.png')}
         style={{
           position: 'absolute',
-          top: 86,
+          top: L.logoTop,
           right: X,
-          height: 132,
+          height: L.logoH,
           opacity: logoIn,
           transform: `scale(${0.85 + logoIn * 0.15})`,
           transformOrigin: 'top right',
@@ -129,7 +156,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       <div
         style={{
           position: 'absolute',
-          top: 124,
+          top: L.headTop,
           left: X,
           right: 300,
           opacity: headIn,
@@ -151,7 +178,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
           <span style={{width: 32, height: 2, background: SPROUT}} />
           VOORDAT JE IETS BOUWT
         </div>
-        <div style={{fontSize: 54, fontWeight: 800, lineHeight: 1.07, letterSpacing: -1.4}}>
+        <div style={{fontSize: L.titleSize, fontWeight: 800, lineHeight: 1.07, letterSpacing: -1.4}}>
           Eerst één antwoord:
           <br />
           <span style={{background: WASH, padding: '0 12px', borderRadius: 10}}>voor wie</span> doen we dit?
@@ -162,7 +189,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       <div
         style={{
           position: 'absolute',
-          top: MID_TOP - 38,
+          top: L.midTop - 38,
           left: X,
           fontFamily: MONO,
           fontSize: 16,
@@ -176,7 +203,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       <div
         style={{
           position: 'absolute',
-          top: MID_TOP - 38,
+          top: L.midTop - 38,
           left: CARD_X,
           fontFamily: MONO,
           fontSize: 16,
@@ -189,7 +216,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       </div>
 
       {/* ---------- Connectors ---------- */}
-      <Connectors frame={frame} flow={loop ? loopT : null} />
+      <Connectors frame={frame} flow={loop ? loopT : null} L={L} />
 
       {/* ---------- Voices ---------- */}
       {VOICES.map((v, i) => {
@@ -202,10 +229,10 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
             key={v.who}
             style={{
               position: 'absolute',
-              top: MID_TOP + i * (VOICE_H + VOICE_GAP),
+              top: L.midTop + i * (L.voiceH + L.voiceGap),
               left: X + v.dx * (1 - settled),
               width: VOICE_W - 40,
-              height: VOICE_H,
+              height: L.voiceH,
               boxSizing: 'border-box',
               padding: '0 20px',
               display: 'flex',
@@ -250,10 +277,10 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       <div
         style={{
           position: 'absolute',
-          top: MID_TOP,
+          top: L.midTop,
           left: CARD_X,
           width: CARD_W,
-          height: CARD_H,
+          height: L.cardH,
           boxSizing: 'border-box',
           padding: '24px 24px',
           borderRadius: 22,
@@ -268,7 +295,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       >
         <div style={{fontSize: 30, fontWeight: 800, letterSpacing: -0.6, lineHeight: 1.1}}>Onze ideale klant</div>
         <div style={{fontFamily: MONO, fontSize: 15, color: WASH, marginTop: 6, letterSpacing: 1}}>1 PAGINA · AAN DE MUUR</div>
-        <div style={{display: 'flex', flexDirection: 'column', gap: 17, marginTop: 26}}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: L.oneGap, marginTop: L.oneTop}}>
           {ONE_PAGER.map((l, k) => {
             const tick = spring({frame: frame - T_CARD - 12 - k * 7, fps, config: {damping: 14, stiffness: 140}});
             return (
@@ -315,7 +342,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       <div
         style={{
           position: 'absolute',
-          top: MOVES_TOP - 36,
+          top: L.movesTop - 36,
           left: X,
           fontFamily: MONO,
           fontSize: 16,
@@ -326,7 +353,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
       >
         ZO HOUD JE HET SCHERP · NAAR SCALING UP (VERNE HARNISH)
       </div>
-      <div style={{position: 'absolute', top: MOVES_TOP, left: X, right: X, display: 'flex', gap: 18}}>
+      <div style={{position: 'absolute', top: L.movesTop, left: X, right: X, display: 'flex', gap: 18}}>
         {MOVES.map((m, i) => {
           const inn = spring({frame: frame - T_MOVES - 8 - i * 14, fps, config: {damping: 200}});
           return (
@@ -334,7 +361,7 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
               key={m.n}
               style={{
                 flex: 1,
-                padding: '22px 20px 26px',
+                padding: L.movesPad,
                 borderRadius: 18,
                 background: CARD,
                 border: `1px solid ${BORDER}`,
@@ -369,11 +396,11 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
           position: 'absolute',
           left: X,
           right: X,
-          bottom: 64,
+          bottom: L.footerBottom,
           display: 'flex',
           alignItems: 'center',
           gap: 14,
-          fontSize: 24,
+          fontSize: L.footerSize,
           fontWeight: 700,
           opacity: interpolate(frame, [T_FOOTER, T_FOOTER + 20], [0, 1], clamp),
         }}
@@ -386,16 +413,16 @@ const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
 };
 
 /* Lines from every voice into the one-pager */
-const Connectors: React.FC<{frame: number; flow: number | null}> = ({frame, flow}) => {
+const Connectors: React.FC<{frame: number; flow: number | null; L: Layout}> = ({frame, flow, L}) => {
   const draw = interpolate(frame, [T_LINES, T_LINES + 30], [0, 1], clamp);
   const x0 = X + VOICE_W - 40 + 6;
   const x1 = CARD_X - 4;
-  const yTarget = MID_TOP + CARD_H / 2;
+  const yTarget = L.midTop + L.cardH / 2;
   const len = 260;
   return (
     <svg width={1080} height={1350} style={{position: 'absolute', left: 0, top: 0, pointerEvents: 'none'}}>
       {VOICES.map((_, i) => {
-        const y0 = MID_TOP + i * (VOICE_H + VOICE_GAP) + VOICE_H / 2;
+        const y0 = L.midTop + i * (L.voiceH + L.voiceGap) + L.voiceH / 2;
         return (
           <path
             key={i}
