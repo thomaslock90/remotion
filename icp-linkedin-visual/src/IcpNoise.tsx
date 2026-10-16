@@ -73,16 +73,28 @@ const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 /* ------------------------------------------------------------------ */
 
-export const IcpNoise: React.FC = () => {
-  const frame = useCurrentFrame();
-  const {fps} = useVideoConfig();
+export const IcpNoise: React.FC = () => <IcpScene loop={false} />;
+
+// Short seamless loop for the GIF: starts and ends on the finished visual, the voices
+// get noisy and settle again while data flows into the one-pager.
+export const IcpLoop: React.FC = () => <IcpScene loop />;
+
+const IcpScene: React.FC<{loop: boolean}> = ({loop}) => {
+  const raw = useCurrentFrame();
+  const {durationInFrames, fps: videoFps} = useVideoConfig();
+  const frame = loop ? 449 : raw;
+  const fps = loop ? 30 : videoFps;
+  const loopT = raw / durationInFrames;
+  const jt = loop ? raw * 2 : frame;
 
   const logoIn = spring({frame: frame - 2, fps, config: {damping: 14, stiffness: 90, mass: 0.9}});
   const headIn = spring({frame: frame - 4, fps, config: {damping: 200}});
   const cardIn = spring({frame: frame - T_CARD, fps, config: {damping: 200}});
   // Noise: voices jitter until the one-pager lands, then settle
-  const noise = interpolate(frame, [T_VOICES, T_VOICES + 20, T_CALM, T_CALM + 30], [0, 1, 1, 0], clamp);
-  const settled = interpolate(frame, [T_CALM, T_CALM + 30], [0, 1], clamp);
+  const noise = loop
+    ? Math.sin(Math.PI * loopT) ** 2
+    : interpolate(frame, [T_VOICES, T_VOICES + 20, T_CALM, T_CALM + 30], [0, 1, 1, 0], clamp);
+  const settled = loop ? 1 - noise : interpolate(frame, [T_CALM, T_CALM + 30], [0, 1], clamp);
 
   return (
     <AbsoluteFill style={{backgroundColor: PAPER, fontFamily: SANS, color: INK}}>
@@ -177,14 +189,14 @@ export const IcpNoise: React.FC = () => {
       </div>
 
       {/* ---------- Connectors ---------- */}
-      <Connectors frame={frame} />
+      <Connectors frame={frame} flow={loop ? loopT : null} />
 
       {/* ---------- Voices ---------- */}
       {VOICES.map((v, i) => {
         const pop = spring({frame: frame - T_VOICES - i * 16, fps, config: {damping: 13, stiffness: 140}});
-        const jx = Math.sin(frame / 3.1 + i * 1.7) * 3 * noise;
-        const jy = Math.cos(frame / 2.7 + i * 2.3) * 2.5 * noise;
-        const rot = v.rot * (1 - settled * 0.7) + Math.sin(frame / 4 + i) * 0.6 * noise;
+        const jx = Math.sin(jt / 3.1 + i * 1.7) * 3 * noise;
+        const jy = Math.cos(jt / 2.7 + i * 2.3) * 2.5 * noise;
+        const rot = v.rot * (1 - settled * 0.7) + Math.sin(jt / 4 + i) * 0.6 * noise;
         return (
           <div
             key={v.who}
@@ -374,7 +386,7 @@ export const IcpNoise: React.FC = () => {
 };
 
 /* Lines from every voice into the one-pager */
-const Connectors: React.FC<{frame: number}> = ({frame}) => {
+const Connectors: React.FC<{frame: number; flow: number | null}> = ({frame, flow}) => {
   const draw = interpolate(frame, [T_LINES, T_LINES + 30], [0, 1], clamp);
   const x0 = X + VOICE_W - 40 + 6;
   const x1 = CARD_X - 4;
@@ -391,8 +403,9 @@ const Connectors: React.FC<{frame: number}> = ({frame}) => {
             stroke={SPROUT}
             strokeWidth={3}
             fill="none"
-            strokeDasharray={len}
-            strokeDashoffset={len * (1 - draw)}
+            // In the loop the line becomes a moving dash pattern; 4 whole periods keep it seamless
+            strokeDasharray={flow === null ? len : '14 10'}
+            strokeDashoffset={flow === null ? len * (1 - draw) : -flow * 24 * 4}
             opacity={0.75}
           />
         );

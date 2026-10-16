@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Composition, Freeze, Sequence, interpolate, useCurrentFrame} from 'remotion';
-import {IcpNoise} from './IcpNoise';
+import {IcpLoop, IcpNoise} from './IcpNoise';
 
 export const FPS = 30;
 export const ANIMATION = 450; // 15s
@@ -31,13 +31,17 @@ const WithPoster: React.FC = () => {
 
 export const RemotionRoot: React.FC = () => {
   return (
-    <Composition
-      id="IcpNoise"
-      component={WithPoster}
-      durationInFrames={DURATION}
-      fps={FPS}
-      width={WIDTH}
-      height={HEIGHT}
-    />
+    <>
+      <Composition
+        id="IcpNoise"
+        component={WithPoster}
+        durationInFrames={DURATION}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+      />
+      {/* 4 s seamless loop for the LinkedIn GIF (render with --scale to 1200x1500) */}
+      <Composition id="IcpLoop" component={IcpLoop} durationInFrames={60} fps={15} width={WIDTH} height={HEIGHT} />
+    </>
   );
 };

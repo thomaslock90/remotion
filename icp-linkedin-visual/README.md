@@ -32,6 +32,19 @@ ffmpeg -i out/icp-noise.mp4 -map 0:v:0 -map 0:a:0 \
   -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart out/icp-noise-linkedin.mp4
 ```
 
+## LinkedIn GIF (organic post)
+
+A separate 4 s seamless loop (`IcpLoop`, 15 fps) that starts and ends on the finished
+visual: the four versions get noisy and settle again while data flows into the one-pager.
+Rendered at 1200×1500 (4:5) and kept well under LinkedIn's 5 MB GIF limit (~2.1 MB):
+
+```bash
+npx remotion render src/index.ts IcpLoop out/loop --sequence --image-format=png --scale=1.1111111
+ffmpeg -framerate 15 -i out/loop/element-%02d.png -vf "palettegen=max_colors=128:stats_mode=full" out/palette.png
+ffmpeg -framerate 15 -i out/loop/element-%02d.png -i out/palette.png \
+  -lavfi "paletteuse=dither=sierra2_4a:diff_mode=rectangle" -loop 0 out/icp-noise.gif
+```
+
 ## Edit
 
 Copy lives at the top of `src/IcpNoise.tsx`: `VOICES`, `ONE_PAGER` and `MOVES`.
