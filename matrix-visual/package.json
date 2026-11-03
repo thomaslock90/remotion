@@ -1,0 +1,20 @@
+{
+  "name": "matrix-visual",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "frames": "remotion render src/index.ts Matrix out/frames --sequence --image-format=png --scale=1.1111111",
+    "still": "remotion still src/index.ts Matrix out/matrix.png --frame=0",
+    "studio": "remotion studio src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.494",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.494"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "typescript": "5.7.2"
+  }
+}
